@@ -25,7 +25,7 @@ namespace Nobi.UiRoundedCorners
 		void Update()
 		{
 			updateDimensions();
-			
+
 		}
 		private void OnValidate()
 		{
@@ -73,7 +73,7 @@ namespace Nobi.UiRoundedCorners
 			if (material == null)
 			{
 				material = new Material(Shader.Find("UI/RoundedCorners/RoundedCorners_resizable"));
-				
+
 			}
 
 			if (image == null)
@@ -97,6 +97,10 @@ namespace Nobi.UiRoundedCorners
 		{
 			return a + (b - a) * t;
 		}
+		Vector3 LERP(Vector3 a, Vector3 b, float t)
+		{
+			return a + (b - a) * t;
+		}
 
 		public void Refresh()
 		{
@@ -115,9 +119,21 @@ namespace Nobi.UiRoundedCorners
 		private void updateDimensions()
 		{
 			var w = LERP(rectangle1.rect.width, rectangle2.rect.width, progress);
-			var h = LERP(rectangle1.rect.height, rectangle2.rect.height, progress);
-
-			transform.GetComponent<RectTransform>().sizeDelta = new Vector2(w, h);
+			var h = LERP(rectangle1.rect.height, rectangle2.rect.height, progress);	
+			// resize
+			var myTransform = transform.GetComponent<RectTransform>();
+			myTransform.sizeDelta = new Vector2(w, h);
+			// center
+			var center = LERP(rectangle1.position, rectangle2.position, progress);
+			var deltaCenter = center - transform.position;
+			// move children the opposite direction of the parent
+			foreach (Transform child in transform)
+			{
+				var tranylvania = child.GetComponent<RectTransform>();
+				tranylvania.position = tranylvania.position - deltaCenter;
+			}
+			// move the parent
+			myTransform.position = myTransform.position + deltaCenter;
 		}
 	}
 }
